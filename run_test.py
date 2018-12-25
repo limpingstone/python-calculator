@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+#
+# run_test.py - By Steven Chen Hao Nyeo 
+# Test script for the calculator backend
+# Last Modified: December 24, 2018
+
 from operand import *
 from function import *
 
@@ -7,11 +13,6 @@ n3 = Number(3)
 
 x = Variable()
 y = Variable()
-#!/usr/bin/env python3
-#
-# run_test.py - By Steven Chen Hao Nyeo 
-# Test script for the calculator backend
-# Last Modified: December 24, 2018
 
 b1 = BinaryOp(x, '+', n3)
 b2 = BinaryOp(x, '-', n3)
