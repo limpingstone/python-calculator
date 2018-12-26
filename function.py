@@ -2,7 +2,7 @@
 #
 # function.py - By Steven Chen Hao Nyeo 
 # The collection of function objects for the python calculator
-# Last Modified: December 24, 2018
+# Created: December 24, 2018
 
 from operand import *
 import math

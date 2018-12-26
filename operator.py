@@ -2,7 +2,7 @@
 #
 # operator.py - By Steven Chen Hao Nyeo 
 # The four operators for computing operations 
-# Last Modified: December 24, 2018
+# Created: December 24, 2018
 
 from enum import Enum
 

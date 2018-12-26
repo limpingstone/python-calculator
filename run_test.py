@@ -2,7 +2,7 @@
 #
 # run_test.py - By Steven Chen Hao Nyeo 
 # Test script for the calculator backend
-# Last Modified: December 24, 2018
+# Created: December 24, 2018
 
 from operand import *
 from function import *
