@@ -21,9 +21,14 @@ class CalculatorFrame(wx.Frame):
 		self.row_2_y = 120
 		self.row_3_y = 180
 		self.row_4_y = 230
-		self.row_5_y = 310
+		self.row_5_y = 300
+		self.row_6_y = 380
+		self.row_7_y = 420
 		
 		self.sandbox_items = []
+		
+		# The result is marked as cleared
+		self.cleared = True
 		
 		# Setup the layout of GUI
 		self.createSandbox(panel)
@@ -140,10 +145,45 @@ class CalculatorFrame(wx.Frame):
 			# Clear the field after the function object is generated 
 			self.functionField.Clear()
 	
+		
+	def onclick_printButton(self, event):
+		if (self.pickIndexField.GetLineLength(0) != 0):
+			self.resultOperand = self.sandbox_items[int(self.pickIndexField.GetLineText(0)) - 1]
+			self.resultField.SetValue(str(self.resultOperand))
+			print("Result: " + str(self.resultOperand))
+			self.cleared = False
+
+	def onclick_clearButton(self, event):
+		self.cleared = True
+		self.resultField.Clear()
+		print("Result cleared")
+	
+	def onclick_derivativeButton(self, event):
+		if (self.resultField.GetLineLength(0) != 0):
+			self.resultOperand = self.resultOperand.derivative()
+			self.resultField.SetValue(str(self.resultOperand))
+			print("Result: " + str(self.resultOperand))
+			self.cleared = False
+	
+	def onclick_valueButton(self, event):
+		if (self.resultField.GetLineLength(0) != 0):
+			self.resultOperand = Number(self.resultOperand.get_value(int(self.valueField.GetLineText(0))))
+			
+			self.resultField.SetValue(str(self.resultOperand))
+			print("Result: " + str(self.resultOperand))
+			self.cleared = False
+	
+	def onclick_addSandboxButton(self, event):
+		if not (self.cleared):
+			self.sandbox_items.append(self.resultOperand)
+			self.appendToSandbox(str(self.resultOperand))
+			print("Added result to sandbox: " + str(self.resultOperand) + " --- Length of list = " + str(len(self.sandbox_items)))
+			
+	
 	# The function that creates the sandbox with the clear button
 	def createSandbox(self, panel):
 		stringSandbox = wx.StaticText(panel, label = "Sandbox", pos = (450, self.row_1_y - 20))
-		self.sandbox = wx.TextCtrl(panel, pos = (450, self.row_1_y), size = (170, 190), style = wx.TE_LEFT | wx.TE_MULTILINE) 
+		self.sandbox = wx.TextCtrl(panel, pos = (450, self.row_1_y), size = (170, 190), style = wx.TE_LEFT | wx.TE_MULTILINE | wx.TE_READONLY) 
 		self.clearSandboxButton = wx.Button(panel, label ="Clear Sandbox", pos = (450, self.row_4_y), size = (170, self.element_height))
 		self.Bind(wx.EVT_BUTTON, self.onclick_clearSandboxButton, self.clearSandboxButton)
 	
@@ -214,15 +254,36 @@ class CalculatorFrame(wx.Frame):
 	# The function that creates the field to print the results
 	def createResultField(self, panel):
 		stringFunction = wx.StaticText(panel, label = "Result", pos = (20, self.row_5_y - 20))
-		self.resultField = wx.TextCtrl(panel, pos = (20, self.row_5_y), size = (410, 150), style = wx.TE_RIGHT | wx.TE_MULTILINE ) 
+		self.resultField = wx.TextCtrl(panel, pos = (20, self.row_5_y), size = (590, 70), style = wx.TE_LEFT | wx.TE_MULTILINE | wx.TE_READONLY) 
 		
 	# The function that creates the button for basic calculator functionality
 	def createCalculatorButton(self, panel):
-		self.CButton = wx.Button(panel, label ="C", pos = (450, self.row_5_y), size = (80, self.element_height))
-		self.CEButton = wx.Button(panel, label ="CE", pos = (540, self.row_5_y), size = (80, self.element_height))
-		self.valueButton = wx.Button(panel, label ="Value", pos = (450, self.row_5_y + 40), size = (170, self.element_height))
-		self.printButton = wx.Button(panel, label ="Print Expression", pos = (450, self.row_5_y + 80), size = (170, self.element_height))
-		self.derivativeButton = wx.Button(panel, label ="Take Derivative", pos = (450, self.row_5_y + 120), size = (170, self.element_height))
+		
+		# The field to pick an operand object using the index from sandbox
+		stringPickIndex = wx.StaticText(panel, label = "Index from sandbox: ", pos = (20, self.row_6_y + 8))
+		self.pickIndexField = wx.TextCtrl(panel, pos = (160, self.row_6_y), size = (150, self.element_height), style = wx.TE_RIGHT)
+		
+		# The button to display the selected operand 
+		self.printButton = wx.Button(panel, label ="Print Expression", pos = (320, self.row_6_y), size = (160, self.element_height))
+		self.Bind(wx.EVT_BUTTON, self.onclick_printButton, self.printButton)
+		
+		# The button to clear the result text box 
+		self.clearButton = wx.Button(panel, label ="Clear", pos = (490, self.row_6_y), size = (120, self.element_height))
+		self.Bind(wx.EVT_BUTTON, self.onclick_clearButton, self.clearButton)
+		
+		# The button to take a derivative of the operand 
+		self.derivativeButton = wx.Button(panel, label ="Take Derivative", pos = (20, self.row_7_y), size = (130, self.element_height))
+		self.Bind(wx.EVT_BUTTON, self.onclick_derivativeButton, self.derivativeButton)
+		
+		# The button that plugs the value of the field in the expression and gets a value
+		self.valueField = wx.TextCtrl(panel, pos = (160, self.row_7_y), size = (150, self.element_height), style = wx.TE_RIGHT)
+		self.valueButton = wx.Button(panel, label ="Plug in x with value", pos = (320, self.row_7_y), size = (160, self.element_height))
+		self.Bind(wx.EVT_BUTTON, self.onclick_valueButton, self.valueButton)
+		
+		# The button that adds the operand to the sandbox 
+		self.addSandboxButton = wx.Button(panel, label ="Add to sandbox", pos = (490, self.row_7_y), size = (120, self.element_height))
+		self.Bind(wx.EVT_BUTTON, self.onclick_addSandboxButton, self.addSandboxButton)
+		
 	
 if __name__ == '__main__':
 	app = wx.App()
