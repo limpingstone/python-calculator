@@ -117,23 +117,23 @@ class CalculatorFrame(wx.Frame):
 	# The function that toggles between different functions
 	# sine = 0; cosine = 1; exponential = 2
 	def onclick_functionChoiceButton(self, event):
-		self.operator_choice = (self.operator_choice + 1) % 3
-		if (self.operator_choice == 0): 
+		self.function_choice = (self.function_choice + 1) % 3
+		if (self.function_choice == 0): 
 			self.functionChoiceButton.SetLabel("sin")
-		elif (self.operator_choice == 1): 
+		elif (self.function_choice == 1): 
 			self.functionChoiceButton.SetLabel("cos")
-		elif (self.operator_choice == 2): 
+		elif (self.function_choice == 2): 
 			self.functionChoiceButton.SetLabel("exp")
 	
 	# The function that generates trigonometric or exponential function objects when clicked
 	def onclick_functionButton(self, event):
 		if (self.functionField.GetLineLength(0) != 0):
 			function_operand = self.sandbox_items[int(self.functionField.GetLineText(0)) - 1]
-			if (self.operator_choice == 0): 
+			if (self.function_choice == 0): 
 				expression = Sin(function_operand)
-			elif (self.operator_choice == 1): 
+			elif (self.function_choice == 1): 
 				expression = Cos(function_operand)
-			elif (self.operator_choice == 2): 
+			elif (self.function_choice == 2): 
 				expression = Exp(function_operand)
 				
 			# Append the new function object to the list and display it in the sandbox
