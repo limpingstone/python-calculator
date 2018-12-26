@@ -7,6 +7,7 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 
+# The four elementary arithmatic operators
 class Operator(Enum):
 	PLUS = '+'
 	SUB = '-'
