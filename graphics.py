@@ -2,10 +2,11 @@
 #
 # graphics.py
 # The graphics interface for the calculator
-# Last Modified: December 25, 2018
+# Created: December 25, 2018
 
 import wx
 from operand import *
+from function import *
 
 class CalculatorFrame(wx.Frame):
 	def __init__(self, parent, title):
@@ -24,7 +25,7 @@ class CalculatorFrame(wx.Frame):
 		
 		self.sandbox_items = []
 		
-		# Setup functions
+		# Setup the layout of GUI
 		self.createSandbox(panel)
 		self.createBasicOperands(panel)
 		self.createBinaryOp(panel)
@@ -32,6 +33,7 @@ class CalculatorFrame(wx.Frame):
 		self.createResultField(panel)
 		self.createCalculatorButton(panel)
 
+	# The function that adds a number object to the sandbox list
 	def onclick_numberButton(self, event):
 		if (self.numberField.GetLineLength(0) != 0):
 			self.sandbox_items.append(Number(self.numberField.GetLineText(0)))
@@ -39,17 +41,20 @@ class CalculatorFrame(wx.Frame):
 			self.appendToSandbox(self.numberField.GetLineText(0))
 			self.numberField.Clear()
 		
+	# The function that adds a variable to the sandbox list 
 	def onclick_variableButton(self, event):
 		self.sandbox_items.append(Variable())
 		print(event.GetEventObject().GetLabel() + " --- Length of list = " + str(len(self.sandbox_items)))
 		self.appendToSandbox("x")
-		
+	
+	# The function that clears the sandbox when the clear button is clicked
 	def onclick_clearSandboxButton(self, event):
 		self.sandbox.SetValue("")
 		self.sandbox_items = []
 	
+	# The function that toggles between the four elementary arithmatic operators 
+	# PLUS = 0, SUB = 1, MULT = 2, DIV = 3
 	def onclick_operatorButton(self, event):
-		# PLUS = 0, SUB = 1, MULT = 2, DIV = 3
 		self.operator_choice = (self.operator_choice + 1) % 4
 		if (self.operator_choice == 0): 
 			self.operatorButton.SetLabel("+")
@@ -59,7 +64,8 @@ class CalculatorFrame(wx.Frame):
 			self.operatorButton.SetLabel("*")
 		elif (self.operator_choice == 3): 
 			self.operatorButton.SetLabel("/")
-		
+	
+	# The function that generates binary operand objects when clicked
 	def onclick_binaryOpButton(self, event):
 		# If one of the operand is left blank, the generate button will not validate
 		# If both the operands are correctly filled, the button will create the binary operand object with the appropriate operator 
@@ -69,10 +75,8 @@ class CalculatorFrame(wx.Frame):
 			if (self.operator_choice == 0): 
 				operator = '+'
 			elif (self.operator_choice == 1): 
-				newBinaryOp = BinaryOp(left, '-', right)
 				operator = '-'
 			elif (self.operator_choice == 2): 
-				newBinaryOp = BinaryOp(left, '*', right)
 				operator = '*'
 			elif (self.operator_choice == 3): 
 				operator = '/'
@@ -87,6 +91,32 @@ class CalculatorFrame(wx.Frame):
 			self.leftOperandField.Clear()
 			self.rightOperandField.Clear()
 	
+	# The function that generates polynomial objects when clicked
+	def onclick_polyButton(self, event):
+		# If either the base or the power was left blank, the button will not validate
+		# If both the base and power are filled in correctly, the button will generate a polynomial object 
+		if (self.baseField.GetLineLength(0) != 0 and self.powerField.GetLineLength(0) != 0):
+			base = self.sandbox_items[int(self.baseField.GetLineText(0)) - 1]
+			power = int(self.powerField.GetLineText(0))
+			
+			# Append the new polynomial object to the list and display it in the sandbox
+			newPolynomial = Polynomial(base, power)
+			self.sandbox_items.append(newPolynomial)
+			self.appendToSandbox(str(newPolynomial))
+			print("Generated new polynomial object: " + str(newPolynomial) + " --- Length of list = " + str(len(self.sandbox_items)))
+			
+			# Clear the base and power after the polynomial object is generated 
+			self.baseField.Clear()
+			self.powerField.Clear()
+	
+	# The function that toggles between different functions
+	def onclick_functionButton(self, event):
+		pass
+	
+	# The function that generates trigonometric or exponential function objects when clicked
+	def onclick_functionButton(self, event):
+		pass
+	
 	# The function that creates the sandbox 
 	def createSandbox(self, panel):
 		stringSandbox = wx.StaticText(panel, label = "Sandbox", pos = (450, self.row_1_y - 20))
@@ -94,21 +124,25 @@ class CalculatorFrame(wx.Frame):
 		self.clearSandboxButton = wx.Button(panel, label ="Clear Sandbox", pos = (450, self.row_4_y), size = (170, self.element_height))
 		self.Bind(wx.EVT_BUTTON, self.onclick_clearSandboxButton, self.clearSandboxButton)
 	
-	# The helper method that iterates the list of operands in the sandbox 
+	# The helper method that iterates the list of operands and displays the list in the sandbox 
 	def appendToSandbox(self, item_string):
 		self.sandbox.SetValue(self.sandbox.GetValue() + "[" + str(len(self.sandbox_items)) + "] " + item_string + "\n")
 	
+	# The function that creates the buttons for generating number and variable objects 
 	def createBasicOperands(self, panel):
 		stringBasicOperands = wx.StaticText(panel, label = "Basic Operands", pos = (20, self.row_1_y - 20))
+		
+		# The button for creating a number object with a value entered in the field
 		self.numberField = wx.TextCtrl(panel, pos = (20, self.row_1_y), size = (130, self.element_height), style = wx.TE_RIGHT) 
 		self.numberButton = wx.Button(panel, label ="Generate Number", pos = (160, self.row_1_y), size = (130, self.element_height))
 		self.Bind(wx.EVT_BUTTON, self.onclick_numberButton, self.numberButton)
 		
+		# The button for creating a variable object 
 		self.variableButton = wx.Button(panel, label ="Generate Variable", pos = (300, self.row_1_y), size = (130, self.element_height))
 		self.Bind(wx.EVT_BUTTON, self.onclick_variableButton, self.variableButton)
 		
+	# The function that creates the buttons for generating binary operand objects 
 	def createBinaryOp(self, panel):
-		
 		# Note to the user
 		stringIndexNote = wx.StaticText(panel, label = "* For the blanks below, please enter the index in the sandbox", pos = (20, self.row_2_y - 45))
 		stringBinaryOp = wx.StaticText(panel, label = "Binary Operators", pos = (20, self.row_2_y - 20))
@@ -128,23 +162,31 @@ class CalculatorFrame(wx.Frame):
 		self.binaryOpButton = wx.Button(panel, label ="Generate", pos = (350, self.row_2_y), size = (80, self.element_height))
 		self.Bind(wx.EVT_BUTTON, self.onclick_binaryOpButton, self.binaryOpButton)
 	
+	# The function that creates the buttons for generating function objects
 	def createFunction(self, panel):
-		stringFunction = wx.StaticText(panel, label = "Functions", pos = (20, self.row_3_y - 20))
+		stringFunction = wx.StaticText(panel, label = "Functions (Input an integer for power)", pos = (20, self.row_3_y - 20))
+		
+		# The fields required to create a polynomial 
+		# Note that the first field takes an index for the base and the second field takes an integer for the power 
 		self.baseField = wx.TextCtrl(panel, pos = (20, self.row_3_y), size = (210, self.element_height), style = wx.TE_RIGHT) 
 		self.polyCaret = wx.StaticText(panel, label = "^", pos = (240, self.row_3_y))
 		self.powerField = wx.TextCtrl(panel, pos = (260, self.row_3_y), size = (80, self.element_height), style = wx.TE_RIGHT) 
 		self.polyButton = wx.Button(panel, label ="Generate", pos = (350, self.row_3_y), size = (80, self.element_height))
+		self.Bind(wx.EVT_BUTTON, self.onclick_polyButton, self.polyButton)
 		
+		# A button to toggle through different functions
 		self.functionChoiceButton = wx.Button(panel, label ="sin", pos = (20, self.row_4_y), size = (80, self.element_height))
 		self.leftParenthesis = wx.StaticText(panel, label = "(", pos = (115, self.row_4_y + 8))
 		self.functionField = wx.TextCtrl(panel, pos = (130, self.row_4_y), size = (190, self.element_height), style = wx.TE_RIGHT) 
 		self.rightParenthesis = wx.StaticText(panel, label = ")", pos = (330, self.row_4_y + 8))
 		self.functionButton = wx.Button(panel, label ="Generate", pos = (350, self.row_4_y), size = (80, self.element_height))
 		
+	# The function that creates the field to print the results
 	def createResultField(self, panel):
 		stringFunction = wx.StaticText(panel, label = "Result", pos = (20, self.row_5_y - 20))
 		self.resultField = wx.TextCtrl(panel, pos = (20, self.row_5_y), size = (410, 150), style = wx.TE_RIGHT | wx.TE_MULTILINE ) 
 		
+	# The function that creates the button for basic calculator functionality
 	def createCalculatorButton(self, panel):
 		self.CButton = wx.Button(panel, label ="C", pos = (450, self.row_5_y), size = (80, self.element_height))
 		self.CEButton = wx.Button(panel, label ="CE", pos = (540, self.row_5_y), size = (80, self.element_height))
