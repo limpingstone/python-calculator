@@ -152,6 +152,7 @@ class CalculatorFrame(wx.Frame):
 			self.resultField.SetValue(str(self.resultOperand))
 			print("Result: " + str(self.resultOperand))
 			self.cleared = False
+			self.pickIndexField.Clear()
 
 	def onclick_clearButton(self, event):
 		self.cleared = True
@@ -172,6 +173,7 @@ class CalculatorFrame(wx.Frame):
 			self.resultField.SetValue(str(self.resultOperand))
 			print("Result: " + str(self.resultOperand))
 			self.cleared = False
+			self.valueField.Clear()
 	
 	def onclick_addSandboxButton(self, event):
 		if not (self.cleared):

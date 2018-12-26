@@ -69,13 +69,13 @@ class BinaryOp(Variable):
 	# Plugs in a number value for the binary operand
 	def get_value(self, x): 
 		if (self.operator == Operator.PLUS.value):
-			return self.left_operand.get_value(x) + self.right_operand.get_value(x)
+			return int(self.left_operand.get_value(x)) + int(self.right_operand.get_value(x))
 		elif (self.operator == Operator.SUB.value):
-			return self.left_operand.get_value(x) - self.right_operand.get_value(x)
+			return int(self.left_operand.get_value(x)) - int(self.right_operand.get_value(x))
 		elif (self.operator == Operator.MULT.value):
-			return self.left_operand.get_value(x) * self.right_operand.get_value(x)
+			return int(self.left_operand.get_value(x)) * int(self.right_operand.get_value(x))
 		elif (self.operator == Operator.DIV.value):
-			return self.left_operand.get_value(x) / self.right_operand.get_value(x)
+			return int(self.left_operand.get_value(x)) / int(self.right_operand.get_value(x))
 	
 	# Takes the derivative of the binary operand - chain rule is implemented
 	def derivative(self):
