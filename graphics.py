@@ -53,7 +53,7 @@ class CalculatorFrame(wx.Frame):
 		self.sandbox_items = []
 	
 	# The function that toggles between the four elementary arithmatic operators 
-	# PLUS = 0, SUB = 1, MULT = 2, DIV = 3
+	# PLUS(+) = 0; SUB(-) = 1; MULT(*) = 2; DIV(/) = 3
 	def onclick_operatorButton(self, event):
 		self.operator_choice = (self.operator_choice + 1) % 4
 		if (self.operator_choice == 0): 
@@ -110,14 +110,37 @@ class CalculatorFrame(wx.Frame):
 			self.powerField.Clear()
 	
 	# The function that toggles between different functions
-	def onclick_functionButton(self, event):
-		pass
+	# sine = 0; cosine = 1; exponential = 2
+	def onclick_functionChoiceButton(self, event):
+		self.operator_choice = (self.operator_choice + 1) % 3
+		if (self.operator_choice == 0): 
+			self.functionChoiceButton.SetLabel("sin")
+		elif (self.operator_choice == 1): 
+			self.functionChoiceButton.SetLabel("cos")
+		elif (self.operator_choice == 2): 
+			self.functionChoiceButton.SetLabel("exp")
 	
 	# The function that generates trigonometric or exponential function objects when clicked
 	def onclick_functionButton(self, event):
-		pass
+		if (self.functionField.GetLineLength(0) != 0):
+			function_operand = self.sandbox_items[int(self.functionField.GetLineText(0)) - 1]
+			if (self.operator_choice == 0): 
+				expression = Sin(function_operand)
+			elif (self.operator_choice == 1): 
+				expression = Cos(function_operand)
+			elif (self.operator_choice == 2): 
+				expression = Exp(function_operand)
+				
+			# Append the new function object to the list and display it in the sandbox
+			function_expression = expression
+			self.sandbox_items.append(function_expression)
+			self.appendToSandbox(str(function_expression))
+			print("Generated new function object: " + str(function_expression) + " --- Length of list = " + str(len(self.sandbox_items)))
+			
+			# Clear the field after the function object is generated 
+			self.functionField.Clear()
 	
-	# The function that creates the sandbox 
+	# The function that creates the sandbox with the clear button
 	def createSandbox(self, panel):
 		stringSandbox = wx.StaticText(panel, label = "Sandbox", pos = (450, self.row_1_y - 20))
 		self.sandbox = wx.TextCtrl(panel, pos = (450, self.row_1_y), size = (170, 190), style = wx.TE_LEFT | wx.TE_MULTILINE) 
@@ -174,12 +197,19 @@ class CalculatorFrame(wx.Frame):
 		self.polyButton = wx.Button(panel, label ="Generate", pos = (350, self.row_3_y), size = (80, self.element_height))
 		self.Bind(wx.EVT_BUTTON, self.onclick_polyButton, self.polyButton)
 		
-		# A button to toggle through different functions
+		# The button to toggle through different functions
 		self.functionChoiceButton = wx.Button(panel, label ="sin", pos = (20, self.row_4_y), size = (80, self.element_height))
+		self.function_choice = 0
+		self.Bind(wx.EVT_BUTTON, self.onclick_functionChoiceButton, self.functionChoiceButton)
+		
+		# GUI Layout for functions
 		self.leftParenthesis = wx.StaticText(panel, label = "(", pos = (115, self.row_4_y + 8))
 		self.functionField = wx.TextCtrl(panel, pos = (130, self.row_4_y), size = (190, self.element_height), style = wx.TE_RIGHT) 
 		self.rightParenthesis = wx.StaticText(panel, label = ")", pos = (330, self.row_4_y + 8))
+		
+		# The button for generating function objects
 		self.functionButton = wx.Button(panel, label ="Generate", pos = (350, self.row_4_y), size = (80, self.element_height))
+		self.Bind(wx.EVT_BUTTON, self.onclick_functionButton, self.functionButton)
 		
 	# The function that creates the field to print the results
 	def createResultField(self, panel):
