@@ -35,13 +35,13 @@ class CalculatorFrame(wx.Frame):
 	def onclick_numberButton(self, event):
 		if (self.numberField.GetLineLength(0) != 0):
 			self.sandbox_items.append(Number(self.numberField.GetLineText(0)))
-			print(event.GetEventObject().GetLabel() + ": " + self.numberField.GetLineText(0))
+			print(event.GetEventObject().GetLabel() + ": " + self.numberField.GetLineText(0) + " --- Length of list = " + str(len(self.sandbox_items)))
 			self.appendToSandbox(self.numberField.GetLineText(0))
 			self.numberField.Clear()
 		
 	def onclick_variableButton(self, event):
 		self.sandbox_items.append(Variable())
-		print(event.GetEventObject().GetLabel())
+		print(event.GetEventObject().GetLabel() + " --- Length of list = " + str(len(self.sandbox_items)))
 		self.appendToSandbox("x")
 		
 	def onclick_clearSandboxButton(self, event):
@@ -61,30 +61,31 @@ class CalculatorFrame(wx.Frame):
 			self.operatorButton.SetLabel("/")
 		
 	def onclick_binaryOpButton(self, event):
-		# If one of the operand is left blank, the 
+		# If one of the operand is left blank, the generate button will not validate
+		# If both the operands are correctly filled, the button will create the binary operand object with the appropriate operator 
 		if (self.leftOperandField.GetLineLength(0) != 0 and self.rightOperandField.GetLineLength(0) != 0):
 			left = self.sandbox_items[int(self.leftOperandField.GetLineText(0)) - 1]
 			right = self.sandbox_items[int(self.rightOperandField.GetLineText(0)) - 1]
 			if (self.operator_choice == 0): 
-				newBinaryOp = BinaryOp(left, '+', right)
-				self.sandbox_items.append(newBinaryOp)
-				self.appendToSandbox(str(newBinaryOp))
+				operator = '+'
 			elif (self.operator_choice == 1): 
 				newBinaryOp = BinaryOp(left, '-', right)
-				self.sandbox_items.append(newBinaryOp)
-				self.appendToSandbox(str(newBinaryOp))
+				operator = '-'
 			elif (self.operator_choice == 2): 
 				newBinaryOp = BinaryOp(left, '*', right)
-				self.sandbox_items.append(newBinaryOp)
-				self.appendToSandbox(str(newBinaryOp))
+				operator = '*'
 			elif (self.operator_choice == 3): 
-				newBinaryOp = BinaryOp(left, '/', right)
-				self.sandbox_items.append(newBinaryOp)
-				self.appendToSandbox(str(newBinaryOp))
+				operator = '/'
+				
+			# Append the new binary operand object to the list and display it in the sandbox
+			newBinaryOp = BinaryOp(left, operator, right)
+			self.sandbox_items.append(newBinaryOp)
+			self.appendToSandbox(str(newBinaryOp))
+			print("Generated new binary operand: " + str(newBinaryOp) + " --- Length of list = " + str(len(self.sandbox_items)))
 
-		# Clear the left and right fields after the BinaryOp object is generated 
-		self.leftOperandField.Clear()
-		self.rightOperandField.Clear()
+			# Clear the left and right fields after the BinaryOp object is generated 
+			self.leftOperandField.Clear()
+			self.rightOperandField.Clear()
 	
 	# The function that creates the sandbox 
 	def createSandbox(self, panel):
@@ -153,6 +154,6 @@ class CalculatorFrame(wx.Frame):
 	
 if __name__ == '__main__':
 	app = wx.App()
-	frame = CalculatorFrame(None, title = "Python calculator")
+	frame = CalculatorFrame(None, title = "Python Scientific Calculator")
 	frame.Show()
 	app.MainLoop()
